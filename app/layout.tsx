@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Nebulla",
-  description: "Your SaaS Builder",
+  description: "All in one agnecy solution",
 };
 
 export default function RootLayout({

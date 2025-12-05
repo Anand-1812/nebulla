@@ -1,24 +1,23 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-/* Enable dark mode class */
 @custom-variant dark (&:is(.dark *));
 
-/* =============================
-   TAILWIND v4 THEME TOKENS
-============================= */
+/* ============================================
+   TAILWIND v4 TOKENS
+=============================================== */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
 
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
 
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
-
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
 
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
@@ -42,121 +41,107 @@
 }
 
 /* ============================================
-   LIGHT MODE — BLACK/GRAY THEME
+   LIGHT MODE (still dark-ish and blue-ish)
 =============================================== */
 :root {
-  --radius: 0.625rem;
+  --radius: 0.5rem;
 
-  /* Soft gray UI, like Vercel light mode */
-  --background: oklch(0.97 0.01 260);         /* #F7F7F7 */
-  --foreground: oklch(0.20 0.02 260);         /* near-black text */
+  /* Light mode = slightly gray-neutral, not pure white */
+  --background: oklch(0.97 0.01 255);         /* soft gray */
+  --foreground: oklch(0.20 0.02 255);         /* deep gray text */
 
-  --card: oklch(0.98 0.005 260);              /* #FAFAFA */
-  --card-foreground: oklch(0.20 0.02 260);
+  /* Deep blue brand color */
+  --primary: oklch(0.60 0.20 260);            /* strong blue */
+  --primary-foreground: oklch(0.98 0 0);      /* white */
 
-  --popover: oklch(1 0 0);                    /* white */
-  --popover-foreground: oklch(0.20 0.02 260);
+  --card: oklch(0.98 0.005 255);
+  --card-foreground: oklch(0.20 0.02 255);
 
-  /* Primary = deep neutral black */
-  --primary: oklch(0.20 0 0);                 /* #000000 (true black) */
-  --primary-foreground: oklch(0.98 0 0);      /* white text */
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.20 0.02 255);
 
-  /* Secondary = light gray pill */
-  --secondary: oklch(0.92 0.01 260);
-  --secondary-foreground: oklch(0.20 0.02 260);
+  /* Soft blue-gray */
+  --secondary: oklch(0.80 0.04 255);
+  --secondary-foreground: oklch(0.20 0.02 255);
 
   /* Muted backgrounds */
-  --muted: oklch(0.90 0.01 260);
-  --muted-foreground: oklch(0.45 0.01 260);
+  --muted: oklch(0.92 0.01 255);
+  --muted-foreground: oklch(0.40 0.01 255);
 
-  /* Accent = subtle dark gray */
-  --accent: oklch(0.88 0.015 260);
-  --accent-foreground: oklch(0.20 0.02 260);
+  /* Nice cyan accent */
+  --accent: oklch(0.75 0.13 220);
+  --accent-foreground: oklch(0.10 0.01 250);
 
-  /* Error */
-  --destructive: oklch(0.55 0.25 25);
+  /* Red error */
+  --destructive: oklch(0.60 0.22 25);
   --destructive-foreground: oklch(0.98 0 0);
 
-  /* Borders */
-  --border: oklch(0.82 0.01 260);
-  --input: oklch(0.82 0.01 260);
-
-  /* Focus ring */
-  --ring: oklch(0.32 0 0); /* dark focus ring */
+  --border: oklch(0.85 0.005 255);
+  --input: oklch(0.85 0.005 255);
+  --ring: oklch(0.60 0.20 260);
 }
 
 /* ============================================
-   DARK MODE — TRUE BLACK THEME
+   DARK MODE — PURE BLACK + BLUE THEME
 =============================================== */
 .dark {
-  /* Background = deep black */
-  --background: oklch(0.14 0 0);              /* #0A0A0A */
-  --foreground: oklch(0.98 0 0);              /* white */
+  --background: oklch(0.13 0 0);              /* PURE BLACK */
+  --foreground: oklch(0.95 0.01 255);         /* soft white */
 
   --card: oklch(0.17 0 0);                    /* #111 */
-  --card-foreground: oklch(0.98 0 0);
+  --card-foreground: oklch(0.95 0.01 255);
 
   --popover: oklch(0.17 0 0);
-  --popover-foreground: oklch(0.98 0 0);
+  --popover-foreground: oklch(0.95 0.01 255);
 
-  /* Primary = bright white button */
-  --primary: oklch(0.98 0 0);                 /* white */
-  --primary-foreground: oklch(0.14 0 0);      /* black text */
+  /* MAIN BLUE (linear.blue / modern SaaS blue) */
+  --primary: oklch(0.70 0.15 260);            /* bright neon blue */
+  --primary-foreground: oklch(0.13 0 0);      /* black text on blue */
 
-  /* Secondary = soft gray */
-  --secondary: oklch(0.28 0 0);               /* #444 */
-  --secondary-foreground: oklch(0.98 0 0);
+  /* Secondary — slate blue */
+  --secondary: oklch(0.32 0.04 255);
+  --secondary-foreground: oklch(0.95 0.01 255);
 
-  /* Muted = panel gray */
-  --muted: oklch(0.22 0 0);
-  --muted-foreground: oklch(0.80 0 0);
+  /* Muted blue-gray */
+  --muted: oklch(0.25 0.03 255);
+  --muted-foreground: oklch(0.75 0.03 255);
 
-  /* Accent gray */
-  --accent: oklch(0.26 0 0);
-  --accent-foreground: oklch(0.98 0 0);
+  /* Accent cyan */
+  --accent: oklch(0.78 0.12 220);             /* neon cyan */
+  --accent-foreground: oklch(0.13 0 0);
 
-  /* Error red */
-  --destructive: oklch(0.55 0.20 25);
-  --destructive-foreground: oklch(0.98 0 0);
+  /* Red */
+  --destructive: oklch(0.62 0.20 25);
+  --destructive-foreground: oklch(0.95 0.01 255);
 
-  /* Borders in dark mode */
-  --border: oklch(0.24 0 0);
-  --input: oklch(0.24 0 0);
+  /* Borders in true-black UI */
+  --border: oklch(0.20 0 0);
+  --input: oklch(0.20 0 0);
 
-  /* Focus ring (white-ish) */
-  --ring: oklch(0.85 0 0);
+  /* Blue glow ring */
+  --ring: oklch(0.70 0.15 260);
 }
 
 /* ============================================
    BASE LAYER
 =============================================== */
 @layer base {
-  * {
-    @apply border-border;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
+  * { @apply border-border; }
+  body { @apply bg-background text-foreground; }
 }
 
 /* ============================================
    UTILITIES
 =============================================== */
-html, body {
-  height: 100vh;
-}
+html, body { height: 100vh; }
 
-*, *::before, *::after {
-  box-sizing: border-box;
-}
+*, *::before, *::after { box-sizing: border-box; }
 
-/* Dot Background */
 .dotPattern {
-  background-image: radial-gradient(rgb(70, 70, 70) 1px, transparent 1px);
+  background-image: radial-gradient(rgb(50, 70, 120) 1px, transparent 1px);
   background-size: 25px 25px;
 }
 
-/* Animations */
 .use-automation-zoom-in {
   animation: automation-zoom-in 0.5s;
 }
@@ -166,7 +151,6 @@ html, body {
   100% { opacity: 1; transform: scale(1); }
 }
 
-/* Hide Scrollbar */
 .no-scrollbar {
   scrollbar-width: none;
   -ms-overflow-style: none;
