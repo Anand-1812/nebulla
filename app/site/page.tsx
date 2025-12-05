@@ -2,7 +2,7 @@ import Image from "next/image";
 
 const Home = () => {
   return (
-    <section className="relative min-h-screen w-full flex flex-col items-center justify-center px-4 pt-24 overflow-hidden bg-black">
+    <section className="relative min-h-screen w-full flex flex-col items-center justify-center px-4 pt-24 overflow-hidden">
 
       <div
         className="absolute inset-0
@@ -11,18 +11,18 @@ const Home = () => {
         [mask-image:radial-gradient(ellipse_70%_50%_at_50%_0%,#000_60%,transparent_120%)]"
       />
 
-      <p className="relative z-10 text-lg md:text-2xl text-center mb-2 tracking-wide text-gray-300">
+      <p className="relative z-10 text-lg md:text-2xl text-center mb-1 tracking-wide">
         Run your agency, in one place
       </p>
 
-      <div className="relative z-10 bg-gradient-to-r from-sky-500 to-blue-500 bg-clip-text text-transparent">
+      <div className="relative z-10 bg-gradient-to-r from-sky-600 via-blue-500 to-white bg-clip-text text-transparent">
         <h1 className="text-[64px] sm:text-[120px] md:text-[200px] font-extrabold leading-none tracking-tight text-center">
           Nebulla
         </h1>
       </div>
 
       {/* Image, overlay */}
-      <div className="relative z-10 flex justify-center items-center md:mt-[-50px]">
+      <div className="relative z-10 flex justify-center items-center md:mt-[-40px]">
         <Image
           src="/preview.png"
           alt="banner image"

@@ -6,7 +6,7 @@
 
 /* =============================
    TAILWIND v4 THEME TOKENS
-   ============================= */
+============================= */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -30,6 +30,7 @@
   --color-accent-foreground: var(--accent-foreground);
 
   --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
 
   --color-border: var(--border);
   --color-input: var(--input);
@@ -40,74 +41,135 @@
   --radius-lg: var(--radius);
 }
 
-/* LIGHT MODE DEFAULTS */
+/* ============================================
+   LIGHT MODE — BLACK/GRAY THEME
+=============================================== */
 :root {
   --radius: 0.625rem;
 
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.129 0.042 264.695);
+  /* Soft gray UI, like Vercel light mode */
+  --background: oklch(0.97 0.01 260);         /* #F7F7F7 */
+  --foreground: oklch(0.20 0.02 260);         /* near-black text */
 
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.129 0.042 264.695);
+  --card: oklch(0.98 0.005 260);              /* #FAFAFA */
+  --card-foreground: oklch(0.20 0.02 260);
 
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.129 0.042 264.695);
+  --popover: oklch(1 0 0);                    /* white */
+  --popover-foreground: oklch(0.20 0.02 260);
 
-  --primary: oklch(0.208 0.042 265.755);
-  --primary-foreground: oklch(0.984 0.003 247.858);
+  /* Primary = deep neutral black */
+  --primary: oklch(0.20 0 0);                 /* #000000 (true black) */
+  --primary-foreground: oklch(0.98 0 0);      /* white text */
 
-  --secondary: oklch(0.968 0.007 247.896);
-  --secondary-foreground: oklch(0.208 0.042 265.755);
+  /* Secondary = light gray pill */
+  --secondary: oklch(0.92 0.01 260);
+  --secondary-foreground: oklch(0.20 0.02 260);
 
-  --muted: oklch(0.968 0.007 247.896);
-  --muted-foreground: oklch(0.554 0.046 257.417);
+  /* Muted backgrounds */
+  --muted: oklch(0.90 0.01 260);
+  --muted-foreground: oklch(0.45 0.01 260);
 
-  --accent: oklch(0.968 0.007 247.896);
-  --accent-foreground: oklch(0.208 0.042 265.755);
+  /* Accent = subtle dark gray */
+  --accent: oklch(0.88 0.015 260);
+  --accent-foreground: oklch(0.20 0.02 260);
 
-  --destructive: oklch(0.577 0.245 27.325);
+  /* Error */
+  --destructive: oklch(0.55 0.25 25);
+  --destructive-foreground: oklch(0.98 0 0);
 
-  --border: oklch(0.929 0.013 255.508);
-  --input: oklch(0.929 0.013 255.508);
-  --ring: oklch(0.704 0.04 256.788);
+  /* Borders */
+  --border: oklch(0.82 0.01 260);
+  --input: oklch(0.82 0.01 260);
+
+  /* Focus ring */
+  --ring: oklch(0.32 0 0); /* dark focus ring */
 }
 
-/* DARK MODE */
+/* ============================================
+   DARK MODE — TRUE BLACK THEME
+=============================================== */
 .dark {
-  --background: oklch(0.129 0.042 264.695);
-  --foreground: oklch(0.984 0.003 247.858);
+  /* Background = deep black */
+  --background: oklch(0.14 0 0);              /* #0A0A0A */
+  --foreground: oklch(0.98 0 0);              /* white */
 
-  --card: oklch(0.208 0.042 265.755);
-  --card-foreground: oklch(0.984 0.003 247.858);
+  --card: oklch(0.17 0 0);                    /* #111 */
+  --card-foreground: oklch(0.98 0 0);
 
-  --popover: oklch(0.208 0.042 265.755);
-  --popover-foreground: oklch(0.984 0.003 247.858);
+  --popover: oklch(0.17 0 0);
+  --popover-foreground: oklch(0.98 0 0);
 
-  --primary: oklch(0.929 0.013 255.508);
-  --primary-foreground: oklch(0.208 0.042 265.755);
+  /* Primary = bright white button */
+  --primary: oklch(0.98 0 0);                 /* white */
+  --primary-foreground: oklch(0.14 0 0);      /* black text */
 
-  --secondary: oklch(0.279 0.041 260.031);
-  --secondary-foreground: oklch(0.984 0.003 247.858);
+  /* Secondary = soft gray */
+  --secondary: oklch(0.28 0 0);               /* #444 */
+  --secondary-foreground: oklch(0.98 0 0);
 
-  --muted: oklch(0.279 0.041 260.031);
-  --muted-foreground: oklch(0.704 0.04 256.788);
+  /* Muted = panel gray */
+  --muted: oklch(0.22 0 0);
+  --muted-foreground: oklch(0.80 0 0);
 
-  --accent: oklch(0.279 0.041 260.031);
-  --accent-foreground: oklch(0.984 0.003 247.858);
+  /* Accent gray */
+  --accent: oklch(0.26 0 0);
+  --accent-foreground: oklch(0.98 0 0);
 
-  --destructive: oklch(0.704 0.191 22.216);
+  /* Error red */
+  --destructive: oklch(0.55 0.20 25);
+  --destructive-foreground: oklch(0.98 0 0);
 
-  --border: oklch(1 0 0 / 0.1);
-  --input: oklch(1 0 0 / 0.15);
-  --ring: oklch(0.551 0.027 264.364);
+  /* Borders in dark mode */
+  --border: oklch(0.24 0 0);
+  --input: oklch(0.24 0 0);
+
+  /* Focus ring (white-ish) */
+  --ring: oklch(0.85 0 0);
 }
 
+/* ============================================
+   BASE LAYER
+=============================================== */
 @layer base {
   * {
     @apply border-border;
   }
-
   body {
     @apply bg-background text-foreground;
   }
 }
+
+/* ============================================
+   UTILITIES
+=============================================== */
+html, body {
+  height: 100vh;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* Dot Background */
+.dotPattern {
+  background-image: radial-gradient(rgb(70, 70, 70) 1px, transparent 1px);
+  background-size: 25px 25px;
+}
+
+/* Animations */
+.use-automation-zoom-in {
+  animation: automation-zoom-in 0.5s;
+}
+
+@keyframes automation-zoom-in {
+  0% { opacity: 0; transform: scale(0.95); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* Hide Scrollbar */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  overflow: scroll;
+}
+
