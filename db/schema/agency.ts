@@ -1,60 +1,64 @@
+// db/schema/agency.ts
 import {
   pgTable,
-  text,
   uuid,
-  varchar,
-  integer,
+  text,
   boolean,
+  integer,
   timestamp,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 
-import { users } from "./schema";
-import { subAccounts } from "./subaccounts";
-import { sidebarOptions } from "./sidebarOptions";
-import { invitations } from "./invitations";
-import { notifications } from "./notifications";
-import { subscriptions } from "./subscriptions";
-import { addOns } from "./addons";
+// Import related tables
+import { users } from "./users";
+import { addOns } from "./addOns";
+import { subAccounts } from "./subaccount";
+import { agencySidebarOptions } from "./agencySidebarOption";
+import { invitations } from "./invitation";
+import { notifications } from "./notification";
+import { subscriptions } from "./subscription";
 
-export const agency = pgTable("agency", {
+export const agencies = pgTable("agencies", {
   id: uuid("id").defaultRandom().primaryKey(),
 
-  connectAccountId: text("connect_account_id"),
-  customerId: text("customer_id").default(""),
+  connectAccountId: text("connect_account_id"), // String?
+  customerId: text("customer_id").default(""), // String default ""
 
-  name: text("name"),
-  agencyLogo: text("agency_logo"),
-  companyEmail: text("company_email"),
-  companyPhone: text("company_phone"),
+  name: text("name").notNull(),
+  agencyLogo: text("agency_logo").notNull(),
+  companyEmail: text("company_email").notNull(),
+  companyPhone: text("company_phone").notNull(),
 
-  whiteLabel: boolean("white_label").default(true),
+  whiteLabel: boolean("white_label").default(true).notNull(),
 
-  address: text("address"),
-  city: text("city"),
-  zipCode: text("zip_code"),
-  state: text("state"),
-  country: text("country"),
+  address: text("address").notNull(),
+  city: text("city").notNull(),
+  zipCode: text("zip_code").notNull(),
+  state: text("state").notNull(),
+  country: text("country").notNull(),
 
-  goal: integer("goal").default(5),
+  goal: integer("goal").default(5).notNull(),
 
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
+  createdAt: timestamp("created_at", { mode: "date" })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp("updated_at", { mode: "date" })
+    .defaultNow()
+    .notNull(),
 });
 
-export const agencyRelations = relations(agency, ({ many, one }) => ({
+export const agencyRelations = relations(agencies, ({ many, one }) => ({
+  // one agency → many users
   users: many(users),
-
   subAccounts: many(subAccounts),
-  sidebarOptions: many(sidebarOptions),
+  sidebarOptions: many(agencySidebarOptions),
   invitations: many(invitations),
   notifications: many(notifications),
-  addOns: many(addOns),
-
   subscription: one(subscriptions, {
-    fields: [agency.id],
+    fields: [agencies.id],
     references: [subscriptions.agencyId],
   }),
-}));
 
+  addOns: many(addOns),
+}));
 

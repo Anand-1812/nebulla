@@ -1,33 +1,50 @@
+// db/schema/users.ts
+import {
+  pgTable,
+  uuid,
+  text,
+  timestamp,
+  index,
+} from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
-import { pgEnum, pgTable, serial, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import { roleEnum } from "./enums";
+import { agencies } from "./agency";
+import { permissions } from "./permission";
+import { tickets } from "./ticket";
+import { notifications } from "./notification";
 
-export const roleEnum = pgEnum('role',
-  ['AGENCY_OWNER', 'AGENCY_ADMIN', 'SUBACCOUNT_USER', 'SUBACCOUNT_GUEST']
+export const users = pgTable(
+  "users",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+
+    name: text("name").notNull(),
+    avatarUrl: text("avatar_url").notNull(),
+    email: text("email").notNull().unique(),
+
+    createdAt: timestamp("created_at", { mode: "date" })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { mode: "date" })
+      .defaultNow()
+      .notNull(),
+
+    role: roleEnum("role").default("SUBACCOUNT_USER").notNull(),
+
+    agencyId: uuid("agency_id"),
+  },
+  (table) => ({
+    agencyIdIdx: index("users_agency_id_idx").on(table.agencyId),
+  })
 );
 
-export const users = pgTable('users', {
-  id: serial("id").primaryKey(),
-  name: text("name"),
-  email: text("email"),
-  avatarUrl: text('avatar_url'),
-
-  createdAt: timestamp("created_at").defaultNow(),
-  updatedAt: timestamp("updated_at").defaultNow(),
-
-  role: roleEnum("role").default("SUBACCOUNT_USER"),
-
-  agencyId: uuid("agency_id"),
-});
-
-export const userRelation = relations(users, ({ one, many }) => ({
-  agency: one(agency, {
+export const userRelations = relations(users, ({ one, many }) => ({
+  agency: one(agencies, {
     fields: [users.agencyId],
-    references: [agency.id],
+    references: [agencies.id],
   }),
-
-  permissions: many(premissions),
+  permissions: many(permissions),
   tickets: many(tickets),
-  notifications: many(notifactions),
+  notifications: many(notifications),
 }));
-
 
