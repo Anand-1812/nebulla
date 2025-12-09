@@ -1,5 +1,6 @@
 'use client'
 
+import * as z from "zod";
 import { agencies } from "@/db/schema"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
@@ -9,7 +10,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui
 import { Form, FormControl, FormField, FormItem, FormLabel } from "../ui/form";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod"
-import * as z from "zod";
 import FileUpload from "../global/file-upload";
 
 // type for inserting, drizzle is weird
