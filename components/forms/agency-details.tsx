@@ -68,7 +68,7 @@ const AgencyDetails = ({ data }: Props) => {
     <AlertDialog>
       <Card className="w-full">
         <CardHeader>Agency Info
-          <CardDescription>
+          <CardDescription className="space-y-2">
             Let's create and agency for your business. You can edit agency setting later from the
             agency settings tab
           </CardDescription>
@@ -77,7 +77,7 @@ const AgencyDetails = ({ data }: Props) => {
           <Form {...form}>
             <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
               <FormField disabled={isLoading} control={form.control} name="agencyLogo" render={({ field }) => (<FormItem>
-                <FormLabel>Agency Logo</FormLabel>
+                <FormLabel className="text-blue-300">Agency Logo</FormLabel>
                 <FormControl>
                   <FileUpload apiEndpoint="agencyLogo" onChange={field.onChange} value={field.value}></FileUpload>
                 </FormControl>
