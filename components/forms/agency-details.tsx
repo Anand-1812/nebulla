@@ -2,17 +2,27 @@
 
 import * as z from "zod";
 import { agencies } from "@/db/schema"
-import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
-import { Toaster } from "../ui/sonner";
-import { AlertDialog } from "../ui/alert-dialog";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
-import { Form, FormControl, FormField, FormItem, FormLabel } from "../ui/form";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod"
-import FileUpload from "../global/file-upload";
+import { useRouter } from "next/navigation"
 
-// type for inserting, drizzle is weird
+import { Input } from "../ui/input";
+import { Button } from "../ui/button";
+import { Switch } from "../ui/switch";
+import Loading from "../global/loading";
+import { useForm } from "react-hook-form";
+import { NumberInput } from "@tremor/react"
+import FileUpload from "../global/file-upload";
+import { zodResolver } from "@hookform/resolvers/zod"
+import { deleteAgency, saveActivityLog, updateAgencyDetails } from "@/lib/queries";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel } from "../ui/form";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription,
+  AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger
+} from "../ui/alert-dialog";
+import { toast } from "sonner";
+
+// agency typedef
 type Agency = typeof agencies.$inferSelect
 
 type Props = {
@@ -34,8 +44,8 @@ const FormSchema = z.object({
 
 const AgencyDetails = ({ data }: Props) => {
   const router = useRouter();
-
   const [deletingAgency, setDeletingAgency] = useState(false);
+
   const form = useForm<z.infer<typeof FormSchema>>({
     mode: "onChange",
     resolver: zodResolver(FormSchema),
@@ -51,40 +61,286 @@ const AgencyDetails = ({ data }: Props) => {
       country: data?.country,
       agencyLogo: data?.agencyLogo
     }
-  })
-  const isLoading = form.formState.isSubmitting
+  });
+
+  const isLoading = form.formState.isSubmitting;
 
   useEffect(() => {
-    if (data) {
-      form.reset(data)
-    }
+    if (data) form.reset(data)
   }, [data]);
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (values: z.infer<typeof FormSchema>) => {
+    try {
+      let newUserData, customerId;
+      if (!data?.id) {
+        const bodyData = {
+          email: values.companyEmail,
+          name: values.name,
+          shipping: {
+            address: {
+              city: values.city,
+              country: values.country,
+              line1: values.address,
+              postal_code: values.zipCode,
+              state: values.zipCode,
+            },
+            name: values.name,
+          },
+          address: {
+            city: values.city,
+            country: values.country,
+            line1: values.address,
+            postal_code: values.zipCode,
+            state: values.zipCode,
+          },
+        };
+      }
+    } catch (error) {
 
-  }
+    }
+  };
 
+  // this deletes the whole agency careful
+  const handleDeleteAgency = async () => {
+    if (!data?.id) return
+
+    setDeletingAgency(true)
+    try {
+      await deleteAgency(data.id);
+      toast.success("Agency Deleted");
+    } catch (error) {
+      console.log(`Error: ${error}`)
+      toast.error("Failed to delete agency");
+    }
+  };
   return (
     <AlertDialog>
       <Card className="w-full">
-        <CardHeader>Agency Info
-          <CardDescription className="space-y-2">
-            Let's create and agency for your business. You can edit agency setting later from the
-            agency settings tab
+        <CardHeader>
+          <CardTitle>Agency Info</CardTitle>
+          <CardDescription>
+            Let's create an agency for your business. You can edit settings later.
           </CardDescription>
         </CardHeader>
+
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-              <FormField disabled={isLoading} control={form.control} name="agencyLogo" render={({ field }) => (<FormItem>
-                <FormLabel className="text-blue-300">Agency Logo</FormLabel>
-                <FormControl>
-                  <FileUpload apiEndpoint="agencyLogo" onChange={field.onChange} value={field.value}></FileUpload>
-                </FormControl>
-              </FormItem>)}>
-              </FormField>
+
+              {/* Agency Logo */}
+              <FormField
+                disabled={isLoading}
+                control={form.control}
+                name="agencyLogo"
+                render={({ field }) => (
+                  <FormItem className="flex-1">
+                    <FormLabel>Agency Logo</FormLabel>
+                    <FormControl>
+                      <FileUpload
+                        apiEndpoint="agencyLogo"
+                        onChange={field.onChange}
+                        value={field.value}
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+
+              {/* Agency Name + Email */}
+              <div className="flex md:flex-row gap-4">
+                <FormField
+                  disabled={isLoading}
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem className="flex-1">
+                      <FormLabel>Agency Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Your agency name" {...field} />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  disabled={isLoading}
+                  control={form.control}
+                  name="companyEmail"
+                  render={({ field }) => (
+                    <FormItem className="flex-1">
+                      <FormLabel>Agency Email</FormLabel>
+                      <FormControl>
+                        <Input placeholder="agency@email.com" {...field} />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              {/* Phone */}
+              <FormField
+                disabled={isLoading}
+                control={form.control}
+                name="companyPhone"
+                render={({ field }) => (
+                  <FormItem className="flex-1">
+                    <FormLabel>Agency Phone Number</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Phone number" {...field} />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+
+              {/* Whitelabel toggle */}
+              <FormField
+                disabled={isLoading}
+                control={form.control}
+                name="whiteLabel"
+                render={({ field }) => (
+                  <FormItem className="flex flex-row items-center justify-between rounded-lg border gap-4 p-4">
+                    <div>
+                      <FormLabel>WhiteLabel Agency</FormLabel>
+                      <FormDescription>
+                        Turning this on will show your agency branding to all sub-accounts.
+                      </FormDescription>
+                    </div>
+                    <FormControl>
+                      <Switch checked={field.value} onCheckedChange={field.onChange} />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+
+              {/* Address */}
+              <FormField
+                disabled={isLoading}
+                control={form.control}
+                name="address"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Address</FormLabel>
+                    <FormControl>
+                      <Input placeholder="123 Street..." {...field} />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+
+              {/* City + State */}
+              <div className="flex md:flex-row gap-4">
+                <FormField
+                  disabled={isLoading}
+                  control={form.control}
+                  name="city"
+                  render={({ field }) => (
+                    <FormItem className="flex-1">
+                      <FormLabel>City</FormLabel>
+                      <FormControl>
+                        <Input placeholder="City" {...field} />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  disabled={isLoading}
+                  control={form.control}
+                  name="state"
+                  render={({ field }) => (
+                    <FormItem className="flex-1">
+                      <FormLabel>State</FormLabel>
+                      <FormControl>
+                        <Input placeholder="State" {...field} />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              {/* Zip and Country */}
+              <div className="flex md:flex-row gap-4">
+                <FormField
+                  disabled={isLoading}
+                  control={form.control}
+                  name="zipCode"
+                  render={({ field }) => (
+                    <FormItem className="flex-1">
+                      <FormLabel>Zip Code</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Zip Code" {...field} />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  disabled={isLoading}
+                  control={form.control}
+                  name="country"
+                  render={({ field }) => (
+                    <FormItem className="flex-1">
+                      <FormLabel>Country</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Country" {...field} />
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+              </div>
+              {data?.id && (<div className="flex flex-col gap-2">
+                <FormLabel>Create a goal</FormLabel>
+                <FormDescription>
+                  {' '} Create a goal for you agency.As your business grows your goals too
+                  so don't forget to set the bar higher!
+                </FormDescription>
+                <NumberInput defaultValue={(data?.goal)} onValueChange={async (val) => {
+                  if (!data?.id) return
+                  await updateAgencyDetails(data.id, { goal: val })
+                  await saveActivityLog({
+                    agencyId: data.id, description: `Updated the agency goal to | ${val} Sub Account`,
+                    subaccountId: undefined
+                  })
+                  router.refresh()
+                }}
+                  min={1} className="bg-background !border !border-input"
+                  placeholder="Sub account goal"
+                />
+              </div>)}
+              <Button type="submit" disabled={isLoading}>
+                {isLoading ? <Loading /> : "Save Agency info"}
+              </Button>
             </form>
           </Form>
+          {data?.id && (
+            <div className="flex flex-row items-center justify-center rounded-lg
+              border-destructive gap-4 mt-4">
+              <div>
+                <div>Danger zone</div>
+                <div className="text-muted-foreground">
+                  Deleting your agency cannpt be undone.
+                  This will also delete all sub accounts and all data related to your sub accounts.
+                  Sub accounts will no longer have access to funnels, contacts etc.
+                </div>
+              </div>
+              <AlertDialogTrigger disabled={isLoading || deletingAgency}
+                className="text-red-500 p-3 text-center mt-2 rounded-md hover:bg-red-600 hover:text-white whitespace-nowrap">
+                {deletingAgency ? "Deleting..." : "Delete Agency"}
+              </AlertDialogTrigger>
+            </div>
+          )}
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle className="text-left">Are you absolutely sure?</AlertDialogTitle>
+              <AlertDialogDescription className="text-left">This action cannot be undone. This will permanently delete the Agency account and all related sub accounts.</AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter className="flex items-center">
+              <AlertDialogCancel className="mb-2">Cancel</AlertDialogCancel>
+              <AlertDialogAction disabled={deletingAgency} className="bg-destructive hover:bg-destructive" onClick={handleDeleteAgency}>
+                Delete
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
         </CardContent>
       </Card>
     </AlertDialog>
@@ -92,3 +348,4 @@ const AgencyDetails = ({ data }: Props) => {
 }
 
 export default AgencyDetails
+

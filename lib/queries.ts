@@ -3,15 +3,17 @@
 import { db } from "@/db";
 import { eq, and } from "drizzle-orm";
 import { users } from "@/db/schema/users";
-import { invitations } from "@/db/schema";
+import { invitations } from "@/db/schema/invitation";
 import { redirect } from "next/navigation";
-import { notifications } from "@/db/schema";
+import { notifications } from "@/db/schema/notification";
 import { agencies } from "@/db/schema/agency";
 import { clerkClient } from "@clerk/nextjs/server";
 import { currentUser } from "@clerk/nextjs/server";
 import { permissions } from "@/db/schema/permission";
 import { subAccounts } from "@/db/schema/subaccount";
 import { agencySidebarOptions } from "@/db/schema/agencySidebarOption";
+
+type Agency = typeof agencies.$inferSelect
 
 export const getAuthUserDetails = async () => {
   const authUser = await currentUser();
@@ -230,4 +232,18 @@ export const verifyAndAcceptInvite = async () => {
   return invitation.agencyId;
 };
 
+export const updateAgencyDetails = async (agencyId: string, agencyDetails: Partial<Agency>) => {
+  const [updatedAgency] = await db
+    .update(agencies)
+    .set(agencyDetails)
+    .where(eq(agencies.id, agencyId))
+    .returning();
+
+  return updatedAgency;
+};
+
+export const deleteAgency = async (agencyId: string) => {
+  const res = await db.delete(agencies).where(eq(agencies.id, agencyId))
+  return res;
+}
 
