@@ -116,9 +116,15 @@ const AgencyDetails = ({ data }: Props) => {
           connectAccountId: "",
           goal: 5,
         });
+        toast.success("Agency created, congrats")
+        if (data?.id) return router.refresh()
+        if (response) {
+          return router.refresh();
+        }
       }
     } catch (error) {
-
+      console.log(error)
+      toast.success("Agency creation failed")
     }
   };
 
