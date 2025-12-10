@@ -13,7 +13,7 @@ import { useForm } from "react-hook-form";
 import { NumberInput } from "@tremor/react"
 import FileUpload from "../global/file-upload";
 import { zodResolver } from "@hookform/resolvers/zod"
-import { deleteAgency, saveActivityLog, updateAgencyDetails } from "@/lib/queries";
+import { deleteAgency, initUser, saveActivityLog, updateAgencyDetails, upsertAgency } from "@/lib/queries";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel } from "../ui/form";
 import {
@@ -21,6 +21,7 @@ import {
   AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger
 } from "../ui/alert-dialog";
 import { toast } from "sonner";
+import { v4 } from "uuid";
 
 // agency typedef
 type Agency = typeof agencies.$inferSelect
@@ -94,6 +95,27 @@ const AgencyDetails = ({ data }: Props) => {
             state: values.zipCode,
           },
         };
+      }
+
+      newUserData = await initUser({ role: 'AGENCY_OWNER' } as any)
+      if (!data?.id) {
+        const response = await upsertAgency({
+          id: data?.id ? data.id : v4(),
+          address: values.address,
+          agencyLogo: values.agencyLogo,
+          city: values.city,
+          companyPhone: values.companyPhone,
+          country: values.country,
+          name: values.name,
+          state: values.state,
+          whiteLabel: values.whiteLabel,
+          zipCode: values.zipCode,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          companyEmail: values.companyEmail,
+          connectAccountId: "",
+          goal: 5,
+        });
       }
     } catch (error) {
 

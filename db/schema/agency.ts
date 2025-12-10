@@ -22,7 +22,6 @@ export const agencies = pgTable("agencies", {
   id: uuid("id").defaultRandom().primaryKey(),
 
   connectAccountId: text("connect_account_id"), // String?
-  customerId: text("customer_id").default(""), // String default ""
 
   name: text("name").notNull(),
   agencyLogo: text("agency_logo").notNull(),

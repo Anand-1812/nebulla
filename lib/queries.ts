@@ -3,17 +3,19 @@
 import { db } from "@/db";
 import { eq, and } from "drizzle-orm";
 import { users } from "@/db/schema/users";
+import { subscriptions } from "@/db/schema/subscription";
 import { invitations } from "@/db/schema/invitation";
 import { redirect } from "next/navigation";
 import { notifications } from "@/db/schema/notification";
 import { agencies } from "@/db/schema/agency";
-import { clerkClient } from "@clerk/nextjs/server";
+import { clerkClient, User } from "@clerk/nextjs/server";
 import { currentUser } from "@clerk/nextjs/server";
 import { permissions } from "@/db/schema/permission";
 import { subAccounts } from "@/db/schema/subaccount";
 import { agencySidebarOptions } from "@/db/schema/agencySidebarOption";
 
 type Agency = typeof agencies.$inferSelect
+type Plan = typeof subscriptions.plan;
 
 export const getAuthUserDetails = async () => {
   const authUser = await currentUser();
@@ -246,4 +248,140 @@ export const deleteAgency = async (agencyId: string) => {
   const res = await db.delete(agencies).where(eq(agencies.id, agencyId))
   return res;
 }
+
+export const initUser = async (newUser: Partial<User>) => {
+  const authUser = await currentUser();
+  if (!authUser) return null;
+
+  const email = authUser.emailAddresses[0].emailAddress;
+
+  const existing = await db
+    .select()
+    .from(users)
+    .where(eq(users.email, email))
+    .limit(1);
+
+  let userRecord;
+
+  if (existing.length > 0) {
+    const [updated] = await db
+      .update(users)
+      .set({
+        avatarUrl: authUser.imageUrl,
+        name: `${authUser.firstName} ${authUser.lastName}`,
+        role: (newUser as any).role,
+      })
+      .where(eq(users.email, email))
+      .returning();
+
+    userRecord = updated;
+  }
+  else {
+    const [created] = await db
+      .insert(users)
+      .values({
+        id: authUser.id,
+        avatarUrl: authUser.imageUrl,
+        email: email,
+        name: `${authUser.firstName} ${authUser.lastName}`,
+        role: (newUser as any).role || "SUBACCOUNT_USER",
+      })
+      .returning();
+
+    userRecord = created;
+  }
+
+  const clerk = await clerkClient();
+  await clerk.users.updateUserMetadata(authUser.id, {
+    privateMetadata: {
+      role: userRecord.role || "SUBACCOUNT_USER",
+    },
+  });
+
+  return userRecord;
+};
+
+export const upsertAgency = async (agency: Agency, price?: Plan) => {
+  if (!agency.companyEmail) return null;
+
+  try {
+    const [existingAgency] = await db
+      .select()
+      .from(agencies)
+      .where(eq(agencies.id, agency.id))
+      .limit(1);
+
+    if (existingAgency) {
+      const [updated] = await db
+        .update(agencies)
+        .set({
+          ...agency,
+          updatedAt: new Date(),
+        })
+        .where(eq(agencies.id, agency.id))
+        .returning();
+
+      return updated;
+    }
+
+    const [createdAgency] = await db
+      .insert(agencies)
+      .values({
+        ...agency,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .returning();
+
+    await db
+      .update(users)
+      .set({ agencyId: agency.id })
+      .where(eq(users.email, agency.companyEmail));
+
+    await db.insert(agencySidebarOptions).values([
+      {
+        agencyId: agency.id,
+        name: "Dashboard",
+        icon: "category",
+        link: `/agency/${agency.id}`,
+      },
+      {
+        agencyId: agency.id,
+        name: "Launchpad",
+        icon: "clipboardIcon",
+        link: `/agency/${agency.id}/launchpad`,
+      },
+      {
+        agencyId: agency.id,
+        name: "Billing",
+        icon: "payment",
+        link: `/agency/${agency.id}/billing`,
+      },
+      {
+        agencyId: agency.id,
+        name: "Settings",
+        icon: "settings",
+        link: `/agency/${agency.id}/settings`,
+      },
+      {
+        agencyId: agency.id,
+        name: "Sub Accounts",
+        icon: "person",
+        link: `/agency/${agency.id}/all-subaccounts`,
+      },
+      {
+        agencyId: agency.id,
+        name: "Team",
+        icon: "shield",
+        link: `/agency/${agency.id}/team`,
+      },
+    ]);
+
+    return createdAgency;
+  } catch (error) {
+    console.error("Error in upsertAgency:", error);
+    return null;
+  }
+};
+
 
