@@ -1,4 +1,4 @@
-const page = ({ params }: {params: {agencyId: string}}) => {
+const page = ({ params }: { params: { agencyId: string } }) => {
   return (
     <div>{params.agencyId}</div>
   )

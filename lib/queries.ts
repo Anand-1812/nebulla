@@ -31,20 +31,30 @@ export const getAuthUserDetails = async () => {
 
   if (!user) return null;
 
-  const [agency] = await db
-    .select()
-    .from(agencies)
-    .where(eq(agencies.id, user.agencyId ?? ""));
+  let agency = null;
+  if (user.agencyId) {
+    const [agencyDetails] = await db
+      .select()
+      .from(agencies)
+      .where(eq(agencies.id, user.agencyId))
+      .limit(1);
 
-  const sidebarOptions = await db
-    .select()
-    .from(agencySidebarOptions)
-    .where(eq(agencySidebarOptions.agencyId, user.agencyId ?? ""));
+    agency = agencyDetails
+  }
 
-  const subAccountsList = await db
-    .select()
-    .from(subAccounts)
-    .where(eq(subAccounts.agencyId, user.agencyId ?? ""));
+  const sidebarOptions = user.agencyId
+    ? await db
+      .select()
+      .from(agencySidebarOptions)
+      .where(eq(agencySidebarOptions.agencyId, user.agencyId))
+    : [];
+
+  const subAccountsList = user.agencyId
+    ? await db
+      .select()
+      .from(subAccounts)
+      .where(eq(subAccounts.agencyId, user.agencyId))
+    : [];
 
   const permissionsList = await db
     .select()
@@ -333,10 +343,14 @@ export const upsertAgency = async (agency: Agency, price?: Plan) => {
       })
       .returning();
 
-    await db
-      .update(users)
-      .set({ agencyId: agency.id })
-      .where(eq(users.email, agency.companyEmail));
+    // 🟢 FIX: Update the CURRENT user, not the email from the form
+    const authUser = await currentUser();
+    if (authUser) {
+      await db
+        .update(users)
+        .set({ agencyId: agency.id })
+        .where(eq(users.email, authUser.emailAddresses[0].emailAddress));
+    }
 
     await db.insert(agencySidebarOptions).values([
       {
@@ -383,5 +397,3 @@ export const upsertAgency = async (agency: Agency, price?: Plan) => {
     return null;
   }
 };
-
-

@@ -11,20 +11,20 @@ const authenticate = async () => {
 
 export const OurFileRouter = {
   subaccountLogo: f({ image: { maxFileSize: "4MB", maxFileCount: 1 } })
-  .middleware(authenticate)
-  .onUploadComplete(() => {}),
+    .middleware(authenticate)
+    .onUploadComplete(async () => {}),
 
   avatar: f({ image: { maxFileSize: "4MB", maxFileCount: 1 } })
-  .middleware(authenticate)
-  .onUploadComplete(() => {}),
+    .middleware(authenticate)
+    .onUploadComplete(async () => {}),
 
   agencyLogo: f({ image: { maxFileSize: "4MB", maxFileCount: 1 } })
-  .middleware(authenticate)
-  .onUploadComplete(() => {}),
+    .middleware(authenticate)
+    .onUploadComplete(async () => {}),
 
   media: f({ image: { maxFileSize: "4MB", maxFileCount: 1 } })
-  .middleware(authenticate)
-  .onUploadComplete(() => {}),
+    .middleware(authenticate)
+    .onUploadComplete(async () => {}),
 } satisfies FileRouter
 
 export type OurFileRouter = typeof OurFileRouter

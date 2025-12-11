@@ -51,28 +51,32 @@ const AgencyDetails = ({ data }: Props) => {
     mode: "onChange",
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      name: data?.name,
-      companyEmail: data?.companyEmail,
-      companyPhone: data?.companyPhone,
+      // 🔴 FIX: Add || "" to ALL fields to prevent 'undefined'
+      name: data?.name || "",
+      companyEmail: data?.companyEmail || "",
+      companyPhone: data?.companyPhone || "",
       whiteLabel: data?.whiteLabel || false,
-      address: data?.address,
-      city: data?.city,
-      zipCode: data?.zipCode,
-      state: data?.state,
-      country: data?.country,
-      agencyLogo: data?.agencyLogo
+      address: data?.address || "",
+      city: data?.city || "",
+      zipCode: data?.zipCode || "",
+      state: data?.state || "",
+      country: data?.country || "",
+      agencyLogo: data?.agencyLogo || ""
     }
   });
 
   const isLoading = form.formState.isSubmitting;
 
   useEffect(() => {
-    if (data) form.reset(data)
+    if (data) {
+      form.reset(data);
+    }
   }, [data]);
 
   const handleSubmit = async (values: z.infer<typeof FormSchema>) => {
     try {
-      let newUserData, customerId;
+      let newUserData;
+      let customerId;
       if (!data?.id) {
         const bodyData = {
           email: values.companyEmail,
@@ -128,7 +132,6 @@ const AgencyDetails = ({ data }: Props) => {
     }
   };
 
-  // this deletes the whole agency careful
   const handleDeleteAgency = async () => {
     if (!data?.id) return
 
@@ -376,4 +379,3 @@ const AgencyDetails = ({ data }: Props) => {
 }
 
 export default AgencyDetails
-

@@ -7,6 +7,7 @@ const isPublicRoute = createRouteMatcher([
   '/agency',
   '/agency/sign-in(.*)',
   '/agency/sign-up(.*)',
+  '/api/uploadthing(.*)'
 ])
 
 export default clerkMiddleware(async (auth, req) => {
@@ -19,6 +20,10 @@ export default clerkMiddleware(async (auth, req) => {
   const url = req.nextUrl;
   const searchParams = url.searchParams.toString();
   let hostname = req.headers;
+
+  if (url.pathname.startsWith('/api/uploadthing')) {
+    return NextResponse.next();
+  }
 
   // converted this to the whole path
   const pathWithSearchParams = `${url.pathname}${searchParams.length > 0 ? `?${searchParams}` : ""}`;

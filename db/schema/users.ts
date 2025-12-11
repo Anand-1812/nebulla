@@ -16,7 +16,7 @@ import { notifications } from "./notification";
 export const users = pgTable(
   "users",
   {
-    id: uuid("id").defaultRandom().primaryKey(),
+    id: text("id").primaryKey(),
 
     name: text("name").notNull(),
     avatarUrl: text("avatar_url").notNull(),
