@@ -51,7 +51,7 @@ const AgencyDetails = ({ data }: Props) => {
     mode: "onChange",
     resolver: zodResolver(FormSchema),
     defaultValues: {
-      // 🔴 FIX: Add || "" to ALL fields to prevent 'undefined'
+      // ✅ FIX: Ensure no undefined values to prevent uncontrolled input errors
       name: data?.name || "",
       companyEmail: data?.companyEmail || "",
       companyPhone: data?.companyPhone || "",
@@ -77,31 +77,10 @@ const AgencyDetails = ({ data }: Props) => {
     try {
       let newUserData;
       let customerId;
-      if (!data?.id) {
-        const bodyData = {
-          email: values.companyEmail,
-          name: values.name,
-          shipping: {
-            address: {
-              city: values.city,
-              country: values.country,
-              line1: values.address,
-              postal_code: values.zipCode,
-              state: values.zipCode,
-            },
-            name: values.name,
-          },
-          address: {
-            city: values.city,
-            country: values.country,
-            line1: values.address,
-            postal_code: values.zipCode,
-            state: values.zipCode,
-          },
-        };
-      }
+      // Note: Removed the unused 'bodyData' block for cleanliness
 
       newUserData = await initUser({ role: 'AGENCY_OWNER' } as any)
+
       if (!data?.id) {
         const response = await upsertAgency({
           id: data?.id ? data.id : v4(),
@@ -120,15 +99,18 @@ const AgencyDetails = ({ data }: Props) => {
           connectAccountId: "",
           goal: 5,
         });
-        toast.success("Agency created, congrats")
-        if (data?.id) return router.refresh()
+
+        // ✅ FIX: Only show success and redirect if response exists
         if (response) {
-          return router.refresh();
+          toast.success("Agency created, congrats");
+          return router.push(`/agency/${response.id}`);
+        } else {
+          toast.error("Oops! Something went wrong. Check the console.");
         }
       }
     } catch (error) {
       console.log(error)
-      toast.success("Agency creation failed")
+      toast.error("Agency creation failed")
     }
   };
 
@@ -139,11 +121,14 @@ const AgencyDetails = ({ data }: Props) => {
     try {
       await deleteAgency(data.id);
       toast.success("Agency Deleted");
+      router.refresh();
     } catch (error) {
       console.log(`Error: ${error}`)
       toast.error("Failed to delete agency");
+      setDeletingAgency(false);
     }
   };
+
   return (
     <AlertDialog>
       <Card className="w-full">

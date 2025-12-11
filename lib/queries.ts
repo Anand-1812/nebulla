@@ -39,21 +39,21 @@ export const getAuthUserDetails = async () => {
       .where(eq(agencies.id, user.agencyId))
       .limit(1);
 
-    agency = agencyDetails
+    agency = agencyDetails;
   }
 
   const sidebarOptions = user.agencyId
     ? await db
-      .select()
-      .from(agencySidebarOptions)
-      .where(eq(agencySidebarOptions.agencyId, user.agencyId))
+        .select()
+        .from(agencySidebarOptions)
+        .where(eq(agencySidebarOptions.agencyId, user.agencyId))
     : [];
 
   const subAccountsList = user.agencyId
     ? await db
-      .select()
-      .from(subAccounts)
-      .where(eq(subAccounts.agencyId, user.agencyId))
+        .select()
+        .from(subAccounts)
+        .where(eq(subAccounts.agencyId, user.agencyId))
     : [];
 
   const permissionsList = await db
@@ -343,12 +343,12 @@ export const upsertAgency = async (agency: Agency, price?: Plan) => {
       })
       .returning();
 
-    // 🟢 FIX: Update the CURRENT user, not the email from the form
+    // ✅ FIX: Update the ACTUAL Logged-In User with the new Agency ID
     const authUser = await currentUser();
     if (authUser) {
       await db
         .update(users)
-        .set({ agencyId: agency.id })
+        .set({ agencyId: createdAgency.id })
         .where(eq(users.email, authUser.emailAddresses[0].emailAddress));
     }
 

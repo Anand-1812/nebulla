@@ -1,7 +1,7 @@
-const page = ({ params }: { params: { agencyId: string } }) => {
+const Page = ({ params }: { params: { agencyId: string } }) => {
   return (
     <div>{params.agencyId}</div>
   )
 }
 
-export default page
+export default Page
